@@ -3,15 +3,17 @@
 
 package enc
 
-func sendMTFValues(w *BitWriter, inUse [256]bool, mtfv []uint16, mtfFreq []int32, nInUse int) {
+func sendMTFValues(w *BitWriter, inUse [256]bool, mtfv []uint16, mtfFreq []int32, nInUse int, sc *Scratch) {
 	alphaSize := nInUse + 2
 	nMTF := len(mtfv)
 
 	lenPack := [BZMaxAlphaSize][4]uint32{}
 	lenT := [BZNGroups][BZMaxAlphaSize]uint8{}
 	rfreq := [BZNGroups][BZMaxAlphaSize]int32{}
-	selector := make([]uint8, 0, BZMaxSelectors)
-	selectorMtf := make([]uint8, 0, BZMaxSelectors)
+	if cap(sc.selector) < BZMaxSelectors {
+		sc.selector = make([]uint8, 0, BZMaxSelectors)
+	}
+	selector := sc.selector[:0]
 
 	nGroups := 6
 	switch {
@@ -113,8 +115,8 @@ func sendMTFValues(w *BitWriter, inUse [256]bool, mtfv []uint16, mtfFreq []int32
 				}
 			}
 			totc += bc
-			fave[bt]++ // #nosec G602 -- bt is argmin over t in [0,nGroups); 2 <= nGroups <= 6
-			selector = append(selector, uint8(bt))
+			fave[bt]++                             // #nosec G602 -- bt is argmin over t in [0,nGroups); 2 <= nGroups <= 6
+			selector = append(selector, uint8(bt)) // #nosec G115 -- bt in [0,nGroups)
 			if nGroups == 6 && ge-gs+1 == 50 {
 				for nn := range 50 {
 					rfreq[bt][mtfv[gs+nn]]++ // #nosec G602 -- mtfv symbols < alphaSize; rfreq second dim is BZMaxAlphaSize
@@ -139,11 +141,17 @@ func sendMTFValues(w *BitWriter, inUse [256]bool, mtfv []uint16, mtfFreq []int32
 		}
 	}
 
-	pos := make([]byte, nGroups)
+	var pos [BZNGroups]byte
 	for i := 0; i < nGroups; i++ {
 		pos[i] = byte(i)
 	}
-	selectorMtf = make([]uint8, len(selector))
+	nsel := len(selector)
+	if cap(sc.selectorMtf) < nsel {
+		sc.selectorMtf = make([]uint8, nsel)
+	} else {
+		sc.selectorMtf = sc.selectorMtf[:nsel]
+	}
+	selectorMtf := sc.selectorMtf
 	for i := range selector {
 		llI := selector[i]
 		j := 0
@@ -250,4 +258,5 @@ func sendMTFValues(w *BitWriter, inUse [256]bool, mtfv []uint16, mtfFreq []int32
 		gs = ge + 1
 		selCtr++
 	}
+	sc.selector = selector
 }
