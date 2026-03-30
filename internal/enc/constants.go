@@ -14,11 +14,11 @@ const (
 	BZRunA = 0
 	BZRunB = 1
 
-	BZLesserICost   = 0
-	BZGreaterICost  = 15
-	BZMaxHuffLen    = 17
-	BZNOvershoot    = 32
-	BZFileMagic     = 0x425a
-	BZBlockMagicHi  = 0x314159265359
-	BZFinalMagicHi  = 0x177245385090
+	BZLesserICost  = 0
+	BZGreaterICost = 15
+	BZMaxHuffLen   = 17
+	BZNOvershoot   = 32
+	BZFileMagic    = 0x425a
+	BZBlockMagicHi = 0x314159265359
+	BZFinalMagicHi = 0x177245385090
 )
