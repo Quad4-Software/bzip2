@@ -16,7 +16,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Source
+      - name: Checkout
         run: |
           set -eu
           SERVER="${GITEA_SERVER_URL:-${GITHUB_SERVER_URL:-}}"
@@ -30,8 +30,7 @@ jobs:
             git config --global credential.helper "!f() { echo username=x-access-token; echo password=${TOKEN}; }; f"
           fi
           git init -q && git remote add origin "${SERVER}/${REPO}.git"
-          SHA="${GITEA_SHA:-${GITHUB_SHA}}"
-          git fetch -q --depth=1 origin "${SHA}" && git checkout -q FETCH_HEAD
+          git fetch -q --depth=1 origin "${GITHUB_SHA}" && git checkout -q FETCH_HEAD
 
       - name: Set up Go
         run: sh scripts/ci/setup-go.sh "${{ env.CI_GO_VERSION }}"
