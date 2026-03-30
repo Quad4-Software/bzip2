@@ -1,6 +1,8 @@
 # bzip2
 
-A small and idiomatic **bzip2 compressor and decompressor** API: compress with `NewWriter`, decompress with `NewReader`. Compression is implemented here; `NewReader` uses the standard library reader so the wire format matches `NewWriter`.
+A small and idiomatic **bzip2 compressor and decompressor** library.
+
+API: compress with `NewWriter`, decompress with `NewReader`. Compression is implemented here; `NewReader` uses the standard library reader so the wire format matches `NewWriter`.
 
 The compressor streams output to the underlying `io.Writer` per block and on `Close`; always check errors from `Write` and `Close`. See [API.md](API.md) for lifecycle and release checks.
 
@@ -17,7 +19,7 @@ On Linux, install the bzip2 development package (`libbz2-dev`, `bzip2-devel`, or
 
 ## Install
 
-```text
+```bash
 go get git.quad4.io/Go-Libs/bzip2@latest
 ```
 
