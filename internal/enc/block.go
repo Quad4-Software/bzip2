@@ -25,7 +25,7 @@ func WriteBlock(w *BitWriter, block []byte, inUse [256]bool, blockCRC uint32, sc
 	unseqToSeq, nInUse := makeUnseqToSeq(inUse)
 	mtfv, mtfFreq := generateMTFValues(block, sa, unseqToSeq, nInUse, scratch)
 	w.WriteBits(24, uint32(origPtr)) // #nosec G115 -- origPtr is BWT index in [0,len(block)); len(block) < 900001
-	sendMTFValues(w, inUse, mtfv, mtfFreq, nInUse)
+	sendMTFValues(w, inUse, mtfv, mtfFreq, nInUse, scratch)
 }
 
 // WriteStreamTrailer writes the stream end marker and combined CRC.
