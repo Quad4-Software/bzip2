@@ -1,22 +1,14 @@
 // SPDX-License-Identifier: 0BSD
 // Copyright (c)2026 Quad4.io
 
+//go:build !libbzip2
+
 package bzip2
 
 import (
-	"errors"
 	"io"
 
 	"git.quad4.io/Go-Libs/bzip2/internal/enc"
-)
-
-var (
-	// ErrClosed is returned when Write or Close is called after Close has completed successfully.
-	ErrClosed = errors.New("bzip2: writer closed")
-	// ErrLevelRange is returned when NewWriter is called with a level outside 1-9.
-	ErrLevelRange = errors.New("bzip2: level must be between 1 and 9")
-	// ErrNilWriter is returned when NewWriter is called with a nil destination writer.
-	ErrNilWriter = errors.New("bzip2: nil io.Writer")
 )
 
 // Writer compresses input to the bzip2 format and writes it to the destination given to [NewWriter].
@@ -116,23 +108,6 @@ func (w *Writer) flushBitWriter() error {
 		return err
 	}
 	w.bw.ResetOutput()
-	return nil
-}
-
-func writeFull(dst io.Writer, p []byte) error {
-	for len(p) > 0 {
-		n, err := dst.Write(p)
-		if n < 0 || len(p) < n {
-			return errors.New("bzip2: invalid Write result")
-		}
-		p = p[n:]
-		if err != nil {
-			return err
-		}
-		if n == 0 && len(p) > 0 {
-			return io.ErrShortWrite
-		}
-	}
 	return nil
 }
 
