@@ -46,8 +46,26 @@ func NewWriter(w io.Writer, level int) (*Writer, error) {
 	zw.rle.NBlockMax = nblockMax
 	zw.rle.Block = make([]byte, 0, nblockMax)
 	zw.rle.ResetStream()
-	zw.bw.Grow(nblockMax * 2)
+	zw.scratch.PrepareEncoderAux()
+	zw.bw.Grow(enc.EncodedBitBufferCap(nblockMax))
 	return zw, nil
+}
+
+// Reset configures w to write a new bzip2 stream to dst, reusing buffers and the same level as
+// construction. Use this to avoid per-stream allocation churn when compressing many payloads.
+// It discards any unfinished stream (call [Writer.Close] before Reset for a valid stream end).
+func (w *Writer) Reset(dst io.Writer) error {
+	if dst == nil {
+		return ErrNilWriter
+	}
+	w.dst = dst
+	w.closed = false
+	w.abortErr = nil
+	w.combinedCRC = 0
+	w.blockNo = 0
+	w.rle.ResetStream()
+	w.bw.ResetForNewStream()
+	return nil
 }
 
 // Write compresses p and appends the compressed form to the underlying writer. It implements [io.Writer].
@@ -59,28 +77,27 @@ func (w *Writer) Write(p []byte) (int, error) {
 	if w.abortErr != nil {
 		return 0, w.abortErr
 	}
-	for i := range p {
-		for {
-			consumed, full := w.rle.AddByte(p[i])
-			if !consumed {
-				if err := w.flushBlock(); err != nil {
-					w.abortErr = err
-					return i, err
-				}
-				w.rle.StartBlock()
-				continue
+	orig := len(p)
+	for len(p) > 0 {
+		n, full := w.rle.AddBytes(p)
+		if n == 0 {
+			if err := w.flushBlock(); err != nil {
+				w.abortErr = err
+				return orig - len(p), err
 			}
-			if full {
-				if err := w.flushBlock(); err != nil {
-					w.abortErr = err
-					return i + 1, err
-				}
-				w.rle.StartBlock()
+			w.rle.StartBlock()
+			continue
+		}
+		p = p[n:]
+		if full {
+			if err := w.flushBlock(); err != nil {
+				w.abortErr = err
+				return orig - len(p), err
 			}
-			break
+			w.rle.StartBlock()
 		}
 	}
-	return len(p), nil
+	return orig, nil
 }
 
 func (w *Writer) flushBlock() error {

@@ -128,10 +128,7 @@ func (c *chunkWriter) Write(p []byte) (int, error) {
 	if len(p) == 0 {
 		return 0, nil
 	}
-	n := len(p)
-	if n > c.max {
-		n = c.max
-	}
+	n := min(len(p), c.max)
 	return c.dst.Write(p[:n])
 }
 
