@@ -65,6 +65,7 @@ Flushes pending data and writes the stream end marker and combined CRC. After a 
 | `ErrClosed` | `Write` or `Close` after successful `Close` |
 | `ErrNilWriter` | `w` is nil in `NewWriter` |
 | `ErrLevelRange` | invalid `level` in `NewWriter` |
+| `ErrWriterUninitialized` | method called on zero-value `Writer` (must use `NewWriter`) |
 
 ## Tests and examples
 
