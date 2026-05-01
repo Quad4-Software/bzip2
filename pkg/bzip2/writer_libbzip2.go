@@ -131,7 +131,7 @@ func (w *Writer) Write(p []byte) (int, error) {
 		return 0, nil
 	}
 	if w.strmPtr == nil || w.inHeap == nil || w.outHeap == nil {
-		err := fmt.Errorf("bzip2: writer not initialized")
+		err := ErrWriterUninitialized
 		w.abortErr = err
 		return 0, err
 	}
@@ -181,7 +181,7 @@ func (w *Writer) Close() error {
 		return w.abortErr
 	}
 	if w.strmPtr == nil || w.outHeap == nil {
-		err := fmt.Errorf("bzip2: writer not initialized")
+		err := ErrWriterUninitialized
 		w.abortErr = err
 		return err
 	}
@@ -235,6 +235,9 @@ func (w *Writer) Close() error {
 func (w *Writer) Reset(dst io.Writer) error {
 	if dst == nil {
 		return ErrNilWriter
+	}
+	if w.level < 1 || w.level > 9 {
+		return ErrWriterUninitialized
 	}
 	w.dst = dst
 	w.closed = false

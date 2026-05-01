@@ -58,6 +58,9 @@ func (w *Writer) Reset(dst io.Writer) error {
 	if dst == nil {
 		return ErrNilWriter
 	}
+	if w.rle.NBlockMax <= 0 {
+		return ErrWriterUninitialized
+	}
 	w.dst = dst
 	w.closed = false
 	w.abortErr = nil
@@ -71,6 +74,9 @@ func (w *Writer) Reset(dst io.Writer) error {
 // Write compresses p and appends the compressed form to the underlying writer. It implements [io.Writer].
 // After [Writer.Close], Write returns [ErrClosed]. After any other error, Write returns that error.
 func (w *Writer) Write(p []byte) (int, error) {
+	if w.rle.NBlockMax <= 0 {
+		return 0, ErrWriterUninitialized
+	}
 	if w.closed {
 		return 0, ErrClosed
 	}
@@ -131,6 +137,9 @@ func (w *Writer) flushBitWriter() error {
 // Close flushes any pending data, writes the stream trailer and combined CRC, and releases resources.
 // Close must be called to produce a valid bzip2 stream. A second Close returns [ErrClosed].
 func (w *Writer) Close() error {
+	if w.rle.NBlockMax <= 0 {
+		return ErrWriterUninitialized
+	}
 	if w.closed {
 		return ErrClosed
 	}
