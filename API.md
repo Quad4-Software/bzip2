@@ -46,6 +46,10 @@ Returns a decompressor for bzip2 data read from `r`. Equivalent to [`compress/bz
 
 Implements `io.Writer`. You **must** call `Close` to finish the stream (trailer and CRC).
 
+### `func (w *Writer) Reset(dst io.Writer) error`
+
+Starts another bzip2 stream to `dst` using the same `level`, reusing internal buffers.
+
 ### `func (w *Writer) Write(p []byte) (n int, err error)`
 
 Writes input; compressed output may be written to the destination before `Close` when a block is filled.
