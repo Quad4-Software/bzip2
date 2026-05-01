@@ -70,3 +70,35 @@ func BenchmarkWriterMultiBlock(b *testing.B) {
 		_, _ = io.Copy(io.Discard, &buf)
 	}
 }
+
+// BenchmarkWriterMultiBlockReuseDiscard compresses the same payload with a single Writer wired to
+// io.Discard and Writer.Reset between iterations. With warm buffers this reports approximately zero heap traffic.
+func BenchmarkWriterMultiBlockReuseDiscard(b *testing.B) {
+	payload := bytes.Repeat([]byte("x"), 600000)
+	b.SetBytes(int64(len(payload)))
+	b.ReportAllocs()
+
+	w, err := bzip2.NewWriter(io.Discard, 9)
+	if err != nil {
+		b.Fatal(err)
+	}
+	if _, err := w.Write(payload); err != nil {
+		b.Fatal(err)
+	}
+	if err := w.Close(); err != nil {
+		b.Fatal(err)
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		if err := w.Reset(io.Discard); err != nil {
+			b.Fatal(err)
+		}
+		if _, err := w.Write(payload); err != nil {
+			b.Fatal(err)
+		}
+		if err := w.Close(); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
