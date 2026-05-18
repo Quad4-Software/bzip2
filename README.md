@@ -1,6 +1,6 @@
 # bzip2
 
-A small and idiomatic **bzip2 compressor and decompressor** library.
+A small and idiomatic **bzip2 compressor and decompressor** library for go.
 
 API: compress with `NewWriter`, decompress with `NewReader`. Compression is implemented here; `NewReader` uses the standard library reader so the wire format matches `NewWriter`.
 
