@@ -8,7 +8,7 @@ package bzip2
 import (
 	"io"
 
-	"git.quad4.io/Go-Libs/bzip2/internal/enc"
+	"github.com/Quad4-Software/bzip2/internal/enc"
 )
 
 // Writer compresses input to the bzip2 format and writes it to the destination given to [NewWriter].

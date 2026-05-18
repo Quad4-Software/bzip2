@@ -30,7 +30,7 @@ On Linux, install the bzip2 development package (`libbz2-dev`, `bzip2-devel`, or
 ## Install
 
 ```bash
-go get git.quad4.io/Go-Libs/bzip2@latest
+go get github.com/Quad4-Software/bzip2@latest
 ```
 
 ## Layout
@@ -49,7 +49,7 @@ import (
 	"bytes"
 	"io"
 
-	"git.quad4.io/Go-Libs/bzip2/pkg/bzip2"
+	"github.com/Quad4-Software/bzip2/pkg/bzip2"
 )
 
 func Example() {
@@ -70,10 +70,6 @@ func Example() {
 ```
 
 See [API.md](API.md) for details.
-
-## Property-based tests
-
-Tests under `tests/` use [pbt](https://git.quad4.io/Go-Libs/pbt) (`git.quad4.io/Go-Libs/pbt/pkg/pbt`).
 
 ## License
 
