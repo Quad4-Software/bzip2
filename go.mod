@@ -1,3 +1,3 @@
-module github.com/Quad4-Software/bzip2
+module quad4/bzip2
 
 go 1.26.2

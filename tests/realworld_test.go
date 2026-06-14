@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Quad4-Software/bzip2/pkg/bzip2"
+	"quad4/bzip2/pkg/bzip2"
 )
 
 func roundtrip(t *testing.T, level int, data []byte) {

@@ -11,7 +11,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/Quad4-Software/bzip2/pkg/bzip2"
+	"quad4/bzip2/pkg/bzip2"
 )
 
 func TestRoundtripEmpty(t *testing.T) {

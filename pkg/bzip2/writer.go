@@ -8,7 +8,7 @@ package bzip2
 import (
 	"io"
 
-	"github.com/Quad4-Software/bzip2/internal/enc"
+	"quad4/bzip2/internal/enc"
 )
 
 // Writer compresses input to the bzip2 format and writes it to the destination given to [NewWriter].

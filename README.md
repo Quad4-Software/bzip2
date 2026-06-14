@@ -30,7 +30,7 @@ On Linux, install the bzip2 development package (`libbz2-dev`, `bzip2-devel`, or
 ## Install
 
 ```bash
-go get github.com/Quad4-Software/bzip2@latest
+go get quad4/bzip2@latest
 ```
 
 ## Layout
@@ -49,7 +49,7 @@ import (
 	"bytes"
 	"io"
 
-	"github.com/Quad4-Software/bzip2/pkg/bzip2"
+	"quad4/bzip2/pkg/bzip2"
 )
 
 func Example() {

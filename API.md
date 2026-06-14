@@ -1,11 +1,11 @@
 # API reference
 
-Module: `github.com/Quad4-Software/bzip2`
+Module: `quad4/bzip2`
 
 Import path:
 
 ```go
-import "github.com/Quad4-Software/bzip2/pkg/bzip2"
+import "quad4/bzip2/pkg/bzip2"
 ```
 
 Single package for **compression** and **decompression**: use `NewWriter` to compress and `NewReader` to decompress. Compression is implemented in this module; `NewReader` wraps the standard library [`compress/bzip2`](https://pkg.go.dev/compress/bzip2) reader so the format matches what `NewWriter` emits.

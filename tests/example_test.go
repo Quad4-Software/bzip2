@@ -9,7 +9,7 @@ import (
 	"io"
 	"log"
 
-	"github.com/Quad4-Software/bzip2/pkg/bzip2"
+	"quad4/bzip2/pkg/bzip2"
 )
 
 func ExampleNewWriter() {
