@@ -1,0 +1,54 @@
+version: '3'
+
+env:
+  GOFLAGS: -mod=vendor
+  GOPROXY: 'off'
+  GOSUMDB: 'off'
+
+vars:
+  GOCMD: go
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  test:
+    desc: Run tests
+    cmds:
+      - '{{.GOCMD}} test -count=1 ./...'
+
+  test-race:
+    desc: Run tests with race detector
+    cmds:
+      - '{{.GOCMD}} test -count=1 -race ./...'
+
+  vet:
+    desc: Run go vet
+    cmds:
+      - '{{.GOCMD}} vet ./...'
+
+  fmt:
+    desc: Format Go code
+    cmds:
+      - '{{.GOCMD}} fmt ./...'
+
+  deps:
+    desc: Tidy go.mod and refresh vendor/ (offline)
+    env:
+      GOFLAGS: ''
+    cmds:
+      - env GOWORK=off {{.GOCMD}} mod tidy
+      - env GOWORK=off {{.GOCMD}} mod vendor
+
+  vendor:
+    desc: Regenerate vendor/ from go.mod
+    env:
+      GOFLAGS: ''
+    cmds:
+      - env GOWORK=off {{.GOCMD}} mod vendor
+
+  check:
+    desc: Run fmt, vet, and tests
+    deps: [fmt, vet, test]
