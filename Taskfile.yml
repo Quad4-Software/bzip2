@@ -7,6 +7,10 @@ env:
 
 vars:
   GOCMD: go
+  GOSOURCES: &gosources
+    - '**/*.go'
+    - go.mod
+    - go.sum
 
 tasks:
   default:
@@ -15,22 +19,32 @@ tasks:
       - task --list
 
   test:
-    desc: Run tests
+    desc: Run tests (uses Go's test cache; instant no-op if nothing changed)
+    sources: *gosources
+    cmds:
+      - '{{.GOCMD}} test ./...'
+
+  test-force:
+    desc: Run tests ignoring the Go test cache
     cmds:
       - '{{.GOCMD}} test -count=1 ./...'
 
   test-race:
     desc: Run tests with race detector
+    sources: *gosources
     cmds:
-      - '{{.GOCMD}} test -count=1 -race ./...'
+      - '{{.GOCMD}} test -race ./...'
 
   vet:
     desc: Run go vet
+    sources: *gosources
     cmds:
       - '{{.GOCMD}} vet ./...'
 
   fmt:
     desc: Format Go code
+    sources:
+      - '**/*.go'
     cmds:
       - '{{.GOCMD}} fmt ./...'
 
@@ -38,6 +52,9 @@ tasks:
     desc: Tidy go.mod and refresh vendor/ (offline)
     env:
       GOFLAGS: ''
+    sources:
+      - go.mod
+      - go.sum
     cmds:
       - env GOWORK=off {{.GOCMD}} mod tidy
       - env GOWORK=off {{.GOCMD}} mod vendor
@@ -46,6 +63,11 @@ tasks:
     desc: Regenerate vendor/ from go.mod
     env:
       GOFLAGS: ''
+    sources:
+      - go.mod
+      - go.sum
+    generates:
+      - vendor/modules.txt
     cmds:
       - env GOWORK=off {{.GOCMD}} mod vendor
 
