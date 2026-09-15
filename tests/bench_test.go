@@ -1,0 +1,104 @@
+// SPDX-License-Identifier: 0BSD
+// Copyright (c)2026 Quad4.io
+
+package bzip2_test
+
+import (
+	"bytes"
+	"io"
+	"testing"
+
+	"github.com/Quad4-Software/bzip2/pkg/bzip2"
+)
+
+func BenchmarkWriter1MiB(b *testing.B) {
+	data := bytes.Repeat([]byte("abcdefghijklmnopqrstuvwxyz\n"), 1<<20/27)
+	b.SetBytes(int64(len(data)))
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		var buf bytes.Buffer
+		w, err := bzip2.NewWriter(&buf, 9)
+		if err != nil {
+			b.Fatal(err)
+		}
+		if _, err := w.Write(data); err != nil {
+			b.Fatal(err)
+		}
+		if err := w.Close(); err != nil {
+			b.Fatal(err)
+		}
+		_, _ = io.Copy(io.Discard, &buf)
+	}
+}
+
+func BenchmarkWriterSmall(b *testing.B) {
+	const s = "hello world\n"
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		var buf bytes.Buffer
+		w, err := bzip2.NewWriter(&buf, 9)
+		if err != nil {
+			b.Fatal(err)
+		}
+		if _, err := io.WriteString(w, s); err != nil {
+			b.Fatal(err)
+		}
+		if err := w.Close(); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+func BenchmarkWriterMultiBlock(b *testing.B) {
+	data := bytes.Repeat([]byte("x"), 600000)
+	b.SetBytes(int64(len(data)))
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		var buf bytes.Buffer
+		w, err := bzip2.NewWriter(&buf, 9)
+		if err != nil {
+			b.Fatal(err)
+		}
+		if _, err := w.Write(data); err != nil {
+			b.Fatal(err)
+		}
+		if err := w.Close(); err != nil {
+			b.Fatal(err)
+		}
+		_, _ = io.Copy(io.Discard, &buf)
+	}
+}
+
+// BenchmarkWriterMultiBlockReuseDiscard compresses the same payload with a single Writer wired to
+// io.Discard and Writer.Reset between iterations. With warm buffers this reports approximately zero heap traffic.
+func BenchmarkWriterMultiBlockReuseDiscard(b *testing.B) {
+	payload := bytes.Repeat([]byte("x"), 600000)
+	b.SetBytes(int64(len(payload)))
+	b.ReportAllocs()
+
+	w, err := bzip2.NewWriter(io.Discard, 9)
+	if err != nil {
+		b.Fatal(err)
+	}
+	if _, err := w.Write(payload); err != nil {
+		b.Fatal(err)
+	}
+	if err := w.Close(); err != nil {
+		b.Fatal(err)
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		if err := w.Reset(io.Discard); err != nil {
+			b.Fatal(err)
+		}
+		if _, err := w.Write(payload); err != nil {
+			b.Fatal(err)
+		}
+		if err := w.Close(); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
